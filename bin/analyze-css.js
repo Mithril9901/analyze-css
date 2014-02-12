@@ -4,12 +4,15 @@
  *
  * @see https://github.com/macbre/analyze-css
  */
+'use strict';
+
 var analyzer = require('./../lib/index'),
-	runner = require('./../lib/runner'),
+	debug = require('debug')('analyze-css:bin'),
 	program = require('optimist'),
+	runner = require('./../lib/runner'),
 	cssString = '',
 	argv = {},
-	url = '';
+	runnerOpts = {};
 
 // parse options
 program
@@ -19,6 +22,7 @@ program
 	.describe('url', 'Set URL of CSS to analyze').string('url')
 	.describe('file', 'Set local CSS file to analyze').string('file')
 
+	.describe('ignore-ssl-errors', 'Ignores SSL errors, such as expired or self-signed certificate errors').boolean('ignore-ssl-errors')
 	.describe('pretty', 'Causes JSON with the results to be pretty-printed').boolean('pretty').alias('pretty', 'p')
 
 	// version / help
@@ -27,6 +31,9 @@ program
 
 // parse it
 argv = program.parse(process.argv);
+
+debug('analyze-css v%s', analyzer.version);
+debug('argv: %j', argv);
 
 // show version number
 if (argv.version === true) {
@@ -40,16 +47,30 @@ if (argv.help === true) {
 	process.exit(0);
 }
 
-// either --url of --file needs to be provided
-if (typeof argv.url !== 'string' && typeof argv.file !== 'string') {
+// support stdin (issue #28)
+if (argv._ && argv._.indexOf('-') > -1) {
+	runnerOpts.stdin = true;
+}
+// --url
+else if (typeof argv.url === 'string') {
+	runnerOpts.url = argv.url;
+}
+// --file
+else if (typeof argv.file === 'string') {
+	runnerOpts.file = argv.file;
+}
+// either --url or --file or - (stdin) needs to be provided
+else {
 	program.showHelp();
 	process.exit(255);
 }
 
-// run the analyzer
-url = argv.url || argv.file;
+runnerOpts.ignoreSslErrors = argv['ignore-ssl-errors'];
 
-runner(url, function(err, res) {
+debug('opts: %j', runnerOpts);
+
+// run the analyzer
+runner(runnerOpts, function(err, res) {
 	var output;
 
 	// emit an error and die
