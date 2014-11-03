@@ -6,9 +6,11 @@ var collection = require('../lib/collection'),
 
 function rule(analyzer) {
 	var selectors = new collection(),
-		mediaQueryStack = [];
+		mediaQueryStack = [],
+		browserPrefixRegEx = /^-(moz|o|webkit|ms)-/;
 
 	analyzer.setMetric('duplicatedSelectors');
+	analyzer.setMetric('duplicatedProperties');
 
 	// handle nested media queries
 	analyzer.on('media', function(query) {
@@ -29,6 +31,41 @@ function rule(analyzer) {
 			// #foo
 			rule.selectors.join(', ')
 		);
+	});
+
+	// find duplicated properties (issue #60)
+	analyzer.on('rule', function(rule) {
+		var propertiesHash = {};
+
+		if (rule.declarations) {
+			rule.declarations.forEach(function(declaration) {
+				var propertyName;
+
+				if (declaration.type === 'declaration') {
+					propertyName = declaration.property;
+
+					// skip properties that require browser prefixes
+					//  background-image:-moz-linear-gradient(...)
+					//  background-image:-webkit-gradient(...)
+					if (browserPrefixRegEx.test(declaration.value) === true) {
+						return;
+					}
+
+					// property was already used in the current selector - report it
+					if (propertiesHash[propertyName] === true) {
+						// report the position of the offending property
+						analyzer.setCurrentPosition(declaration.position);
+
+						analyzer.incrMetric('duplicatedProperties');
+						analyzer.addOffender('duplicatedProperties', format('%s {%s: %s}', rule.selectors.join(', '), declaration.property, declaration.value));
+					}
+					else {
+						// mark given property as defined in the context of the current selector
+						propertiesHash[propertyName] = true;
+					}
+				}
+			});
+		}
 	});
 
 	// special handling for @font-face (#52)
@@ -56,5 +93,5 @@ function rule(analyzer) {
 	});
 }
 
-rule.description = 'Reports duplicated CSS selectors';
+rule.description = 'Reports duplicated CSS selectors and properties';
 module.exports = rule;
