@@ -35,6 +35,8 @@ echo ".foo {margin: 0 \!important}" | analyze-css -
 
 This will emit JSON formatted results on ``stdout``. Use ``--pretty`` (or ``-p`` shortcut) option to make the output readable for human beings.
 
+Basic HTTP authentication can be provided through the options `--auth-user` and `--auth-pass`.
+
 ### CommonJS module
 
 ```js
@@ -91,7 +93,9 @@ It uses configurable threshold and compares the analyze-css result with it.
     "importants": 3,
     "mediaQueries": 0,
     "multiClassesSelectors": 74,
+    "parsingErrors": 0,
     "oldPropertyPrefixes": 79,
+    "propertyResets": 0,
     "qualifiedSelectors": 28,
     "specificityIdAvg": 0.04,
     "specificityIdTotal": 25,
@@ -99,6 +103,8 @@ It uses configurable threshold and compares the analyze-css result with it.
     "specificityClassTotal": 904,
     "specificityTagAvg": 0.79,
     "specificityTagTotal": 562,
+    "selectors": 712,
+    "selectorLengthAvg": 1.5722460658082975,
     "selectorsByAttribute": 92,
     "selectorsByClass": 600,
     "selectorsById": 25,
@@ -107,7 +113,6 @@ It uses configurable threshold and compares the analyze-css result with it.
     "universalSelectors": 5,
     "length": 55173,
     "rules": 433,
-    "selectors": 712,
     "declarations": 1288
   },
   "offenders": {
@@ -137,7 +142,9 @@ It uses configurable threshold and compares the analyze-css result with it.
 * **importants**: number of properties with value forced by ``!important``
 * **mediaQueries**: number of media queries (e.g. ``@media screen and (min-width: 1370px)``)
 * **multiClassesSelectors**: reports selectors with multiple classes (e.g. ``span.foo.bar``)
+* **parsingErrors**: number of CSS parsing errors
 * **oldPropertyPrefixes**: number of properties with no longer needed vendor prefix, powered by data provided by [autoprefixer](https://github.com/ai/autoprefixer) (e.g. ``--moz-border-radius``)
+* **propertyResets**: number of [accidental property resets](http://css-tricks.com/accidental-css-resets/)
 * **qualifiedSelectors**: number of [qualified selectors](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Writing_efficient_CSS) (e.g. ``header#nav``, ``.foo#bar``, ``h1.title``)
 * **specificityIdAvg**: average [specificity](http://css-tricks.com/specifics-on-css-specificity/) for ID
 * **specificityIdTotal**: total [specificity](http://css-tricks.com/specifics-on-css-specificity/) for ID
@@ -145,6 +152,8 @@ It uses configurable threshold and compares the analyze-css result with it.
 * **specificityClassTotal**: total [specificity](http://css-tricks.com/specifics-on-css-specificity/) for class, pseudo-class or attribute
 * **specificityTagAvg**: average [specificity](http://css-tricks.com/specifics-on-css-specificity/) for element
 * **specificityTagTotal**: total [specificity](http://css-tricks.com/specifics-on-css-specificity/) for element
+* **selectors**: number of selectors (e.g. ``.foo, .bar { color: red }`` is counted as two selectors - ``.foo`` and ``.bar``)
+* **selectorLengthAvg**: average length of selector (e.g. for ``.foo .bar, #test div > span { color: red }`` will be set as 2.5)
 * **selectorsByAttribute**: number of selectors by attribute (e.g. ``.foo[value=bar]``)
 * **selectorsByClass**: number of selectors by class
 * **selectorsById**: number of selectors by ID
@@ -153,7 +162,6 @@ It uses configurable threshold and compares the analyze-css result with it.
 * **universalSelectors**: number of selectors trying to match every element (e.g. ``.foo > *``)
 * **length**: length of CSS source (in bytes)
 * **rules**: number of rules (e.g. ``.foo, .bar { color: red }`` is counted as one rule)
-* **selectors**: number of selectors (e.g. ``.foo, .bar { color: red }`` is counted as two selectors - ``.foo`` and ``.bar``)
 * **declarations**: number of declarations (e.g. ``.foo, .bar { color: red }`` is counted as one declaration - ``color: red``)
 
 ## Read more

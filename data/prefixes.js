@@ -5,19 +5,20 @@
  * @see https://github.com/ai/autoprefixer
  */
 var autoprefixer = require('autoprefixer-core'),
+	browserslist = require('browserslist'),
 	debug = require('debug')('analyze-css:prefixes'),
 	fs = require('fs'),
-	instance = new autoprefixer(),
-	prefixes = instance.data.prefixes,
+	prefixes = autoprefixer.data.prefixes,
 	// data
 	browsersByPrefix = {},
+	namesByVendor = {},
 	data;
 
 // prepare data
 data = {
 	generated: (new Date()).toJSON().substr(0, 10) + ' using autoprefixer-core v' + (require('../node_modules/autoprefixer-core/package.json').version),
 	// supported browsers, i.e. will keep venoder prefixes that they require
-	browsers: instance.browsers,
+	browsers: browserslist().sort(),
 	// list of prefixes: prefix / hash (keep: true / false, msg: reason, list of browsers)
 	prefixes: {}
 };
@@ -27,8 +28,8 @@ debug('Supported browsers: %s', data.browsers.join(', '));
 
 // prepare vendors data
 // [prefix] => [supported browsers]
-Object.keys(instance.data.browsers).forEach(function(vendor) {
-	var vendorData = instance.data.browsers[vendor],
+Object.keys(autoprefixer.data.browsers).forEach(function(vendor) {
+	var vendorData = autoprefixer.data.browsers[vendor],
 		prefix = vendorData.prefix;
 
 	if (typeof browsersByPrefix[prefix] === 'undefined') {
@@ -46,9 +47,13 @@ Object.keys(instance.data.browsers).forEach(function(vendor) {
 			browsersByPrefix[prefix].browsers.push(browser);
 		}
 	});
+
+	// "and_uc" : "UC Browser for Android"
+	namesByVendor[vendor] = vendorData.browser;
 });
 
 debug('Browsers by prefix: %j' ,browsersByPrefix);
+debug('Names by vendor: %j', namesByVendor);
 
 function getLatestVersions(browsers, oldest) {
 	var latest = {},
@@ -72,7 +77,7 @@ function getLatestVersions(browsers, oldest) {
 	});
 
 	Object.keys(latest).forEach(function(vendor) {
-		ret.push(vendor + ' ' + latest[vendor]);
+		ret.push((namesByVendor[vendor] || vendor) + ' ' + latest[vendor]);
 	});
 
 	return ret;
@@ -124,6 +129,8 @@ Object.keys(prefixes).forEach(function(property) {
 			keep = true;
 			msg = 'required by ' + getLatestVersions(browsers, true).join(', ') + ' and later';
 		}
+
+		prefix = '-' + prefix + '-'; // "mozborder-radius" -> "-moz-border-radius"
 
 		debug('%j', browsers);
 		debug('%s: keep? %j (%s)', prefix + property, !!keep, msg);
