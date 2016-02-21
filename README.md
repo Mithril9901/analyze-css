@@ -8,6 +8,8 @@ analyze-css
 
 CSS selectors complexity and performance analyzer. analyze-css is built as a set of rules bound to events fired by CSS parser. Each rule can generate metrics and add "offenders" with more detailed information (see Usage section for an example).
 
+- [Analyze CSS Demo](http://www.testmycss.com/)
+
 ## Install
 
 analyze-css comes as a "binary" for command-line and as CommonJS module. Run the following to install them globally:
@@ -74,7 +76,7 @@ It uses configurable threshold and compares the analyze-css result with it.
 
 ```json
 {
-  "generator": "analyze-css v0.8.0",
+  "generator": "analyze-css v0.10.2",
   "metrics": {
     "base64Length": 11332,
     "redundantBodySelectors": 0,
@@ -92,6 +94,7 @@ It uses configurable threshold and compares the analyze-css result with it.
     "imports": 0,
     "importants": 3,
     "mediaQueries": 0,
+    "notMinified": 0,
     "multiClassesSelectors": 74,
     "parsingErrors": 0,
     "oldPropertyPrefixes": 79,
@@ -141,6 +144,7 @@ It uses configurable threshold and compares the analyze-css result with it.
 * **imports** number of ``@import`` rules
 * **importants**: number of properties with value forced by ``!important``
 * **mediaQueries**: number of media queries (e.g. ``@media screen and (min-width: 1370px)``)
+* **notMinified**: set to 1 if the provided CSS is not minified
 * **multiClassesSelectors**: reports selectors with multiple classes (e.g. ``span.foo.bar``)
 * **parsingErrors**: number of CSS parsing errors
 * **oldPropertyPrefixes**: number of properties with no longer needed vendor prefix, powered by data provided by [autoprefixer](https://github.com/ai/autoprefixer) (e.g. ``--moz-border-radius``)
