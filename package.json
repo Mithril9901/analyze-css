@@ -1,6 +1,6 @@
 {
   "name": "analyze-css",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "author": "Maciej Brencz <maciej.brencz@gmail.com> (https://github.com/macbre)",
   "description": "CSS selectors complexity and performance analyzer",
   "main": "./lib/index.js",
@@ -15,7 +15,7 @@
     "stylesheet",
     "webperf"
   ],
-  "license": "BSD",
+  "license": "BSD-2-Clause",
   "engines": {
     "node": ">=0.8"
   },
@@ -26,8 +26,7 @@
     "debug": "2.2.x",
     "fast-stats": "0.0.x",
     "glob": "7.0.x",
-    "node-sass": "^3.4.1",
-    "onecolor": "^2.5.0",
+    "onecolor": "^3.0.0",
     "optimist": "0.6.x",
     "slick": "~1.12.1",
     "specificity": "~0.1.3"
